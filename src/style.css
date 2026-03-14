@@ -1,0 +1,866 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+JP:wght@300;400;500;700;900&family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+:root {
+  --fids-bg: #0a0e1a;
+  --fids-header-bg: #111827;
+  --fids-row-even: #0f172a;
+  --fids-row-odd: #1e293b;
+  --fids-text: #e2e8f0;
+  --fids-accent: #fbbf24;
+  --fids-green: #22c55e;
+  --fids-red: #ef4444;
+  --fids-orange: #f97316;
+  --fids-blue: #3b82f6;
+  --fids-border: #334155;
+  --admin-bg: #0f172a;
+  --admin-card: #1e293b;
+  --admin-accent: #6366f1;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: 'Inter', 'Noto Sans JP', 'Noto Sans SC', 'Noto Sans KR', sans-serif;
+  background: var(--fids-bg);
+  color: var(--fids-text);
+  overflow-x: hidden;
+}
+
+/* ========================================
+   FIDS STYLES
+======================================== */
+
+.fids-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--fids-bg);
+  overflow: hidden;
+}
+
+.fids-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+  padding: 12px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--fids-accent);
+  flex-shrink: 0;
+}
+
+.fids-header h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: white;
+}
+
+.fids-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.9rem;
+  color: var(--fids-accent);
+}
+
+.fids-table-container {
+  flex: 1;
+  overflow: hidden;
+  padding: 0;
+}
+
+.fids-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.fids-table thead {
+  background: linear-gradient(180deg, #1a2744 0%, #0f1b33 100%);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.fids-table thead th {
+  padding: 10px 12px;
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fids-accent);
+  border-bottom: 2px solid var(--fids-accent);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.fids-table tbody tr {
+  transition: background 0.3s ease, opacity 0.3s ease;
+}
+
+.fids-table tbody tr:nth-child(even) {
+  background: var(--fids-row-even);
+}
+
+.fids-table tbody tr:nth-child(odd) {
+  background: var(--fids-row-odd);
+}
+
+.fids-table tbody tr:hover {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.fids-table tbody td {
+  padding: 8px 12px;
+  font-size: 0.88rem;
+  border-bottom: 1px solid var(--fids-border);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+.fids-table .col-time { width: 7%; font-variant-numeric: tabular-nums; }
+.fids-table .col-dest { width: 18%; }
+.fids-table .col-flight { width: 9%; }
+.fids-table .col-logo { width: 4%; text-align: center; }
+.fids-table .col-airline { width: 18%; }
+.fids-table .col-gate { width: 6%; text-align: center; }
+.fids-table .col-status { width: 10%; }
+.fids-table .col-terminal { width: 7%; text-align: center; }
+.fids-table .col-checkin { width: 9%; text-align: center; }
+.fids-table .col-codeshare { width: 12%; }
+
+.airline-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.6rem;
+  color: white;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.status-ontime { color: var(--fids-green); }
+.status-boarding { color: var(--fids-accent); animation: pulse-text 1.5s ease-in-out infinite; }
+.status-delayed { color: var(--fids-orange); }
+.status-departed { color: var(--fids-blue); }
+.status-cancelled { color: var(--fids-red); font-weight: 700; }
+.status-nowboarding { color: var(--fids-accent); animation: pulse-text 1.5s ease-in-out infinite; }
+
+@keyframes pulse-text {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Language transition */
+.fids-lang-fade-enter {
+  animation: fadeSlideIn 0.6s ease forwards;
+}
+
+.fids-lang-fade-exit {
+  animation: fadeSlideOut 0.4s ease forwards;
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeSlideOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-6px); }
+}
+
+/* ========================================
+   GIDS STYLES — Common
+======================================== */
+
+.gids-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.gids-normal {
+  background: linear-gradient(135deg, #0a1628 0%, #122244 40%, #0a1628 100%);
+}
+
+.gids-priority {
+  background: linear-gradient(135deg, #3d1800 0%, #7c3200 40%, #3d1800 100%);
+}
+
+.gids-closed {
+  background: linear-gradient(135deg, #3b0000 0%, #7c0000 40%, #3b0000 100%);
+}
+
+@keyframes gids-template-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pulse-badge {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+/* --- Normal Template --- */
+
+.gids-header {
+  padding: 24px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 3px solid;
+  flex-shrink: 0;
+}
+
+.gids-normal .gids-header { border-color: var(--fids-accent); }
+
+.gids-gate-label {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.gids-gate-number {
+  font-size: 4rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.gids-normal .gids-gate-number { color: var(--fids-accent); }
+
+.gids-status-badge {
+  padding: 12px 32px;
+  border-radius: 12px;
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.gids-normal .gids-status-badge {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  border: 2px solid #22c55e;
+}
+
+.gids-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 48px;
+  gap: 48px;
+}
+
+.gids-flight-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  width: 100%;
+  max-width: 900px;
+}
+
+.gids-info-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 28px 32px;
+  backdrop-filter: blur(10px);
+}
+
+.gids-info-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 8px;
+}
+
+.gids-info-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: white;
+  line-height: 1.2;
+}
+
+.gids-destination-card {
+  grid-column: 1 / -1;
+}
+
+.gids-destination-card .gids-info-value {
+  font-size: 2.8rem;
+}
+
+/* --- Priority Boarding Template --- */
+
+.gids-priority-topbar {
+  padding: 20px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 4px solid #fb923c;
+  background: rgba(0,0,0,0.3);
+  flex-shrink: 0;
+}
+
+.gids-priority-gate {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #fb923c;
+  line-height: 1;
+}
+
+.gids-priority-flight-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,0.08);
+  padding: 8px 20px;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: white;
+}
+
+.gids-priority-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 40px;
+}
+
+.gids-priority-icon {
+  font-size: 5rem;
+  animation: priority-float 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px rgba(251,146,60,0.5));
+}
+
+@keyframes priority-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.gids-priority-badge-large {
+  padding: 16px 48px;
+  border-radius: 16px;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  background: rgba(251, 146, 60, 0.2);
+  color: #fb923c;
+  border: 3px solid #fb923c;
+  animation: pulse-badge 2s ease-in-out infinite;
+}
+
+.gids-priority-message-line1 {
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: white;
+  letter-spacing: 0.05em;
+  margin-top: 12px;
+  text-shadow: 0 2px 20px rgba(251,146,60,0.3);
+}
+
+.gids-priority-message-line2 {
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: #fbbf24;
+  letter-spacing: 0.05em;
+  text-shadow: 0 2px 20px rgba(251,191,36,0.3);
+}
+
+.gids-priority-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-top: 32px;
+  padding: 20px 40px;
+  background: rgba(0,0,0,0.25);
+  border-radius: 16px;
+  border: 1px solid rgba(251,146,60,0.2);
+}
+
+.gids-priority-detail-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.gids-priority-detail-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.4);
+}
+
+.gids-priority-detail-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: white;
+  font-variant-numeric: tabular-nums;
+}
+
+.gids-priority-detail-divider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255,255,255,0.15);
+}
+
+/* --- Boarding Closed Template --- */
+
+.gids-closed-topbar {
+  padding: 20px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 4px solid #f87171;
+  background: rgba(0,0,0,0.3);
+  flex-shrink: 0;
+}
+
+.gids-closed-gate {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #f87171;
+  line-height: 1;
+}
+
+.gids-closed-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 40px;
+}
+
+.gids-closed-icon {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(248, 113, 113, 0.15);
+  border: 4px solid #f87171;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: 900;
+  color: #f87171;
+}
+
+.gids-closed-badge-large {
+  padding: 16px 48px;
+  border-radius: 16px;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  background: rgba(248, 113, 113, 0.2);
+  color: #f87171;
+  border: 3px solid #f87171;
+}
+
+.gids-closed-message-line1 {
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: white;
+  letter-spacing: 0.05em;
+  margin-top: 12px;
+  text-shadow: 0 2px 20px rgba(248,113,113,0.3);
+}
+
+.gids-closed-message-line2 {
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: #fca5a5;
+  letter-spacing: 0.05em;
+  text-shadow: 0 2px 20px rgba(248,113,113,0.3);
+}
+
+.gids-closed-subtext {
+  margin-top: 20px;
+  font-size: 1.2rem;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.08em;
+}
+
+/* ========================================
+   ADMIN STYLES
+======================================== */
+
+.admin-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+  padding: 32px;
+}
+
+.admin-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.admin-header h1 {
+  font-size: 2rem;
+  font-weight: 900;
+  background: linear-gradient(to right, #818cf8, #c084fc, #818cf8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: 0.05em;
+}
+
+.admin-header p {
+  color: rgba(255,255,255,0.5);
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.admin-card {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 28px;
+  backdrop-filter: blur(12px);
+}
+
+.admin-card h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-card h2 .icon {
+  font-size: 1.4rem;
+}
+
+.admin-section {
+  margin-bottom: 20px;
+}
+
+.admin-section label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 8px;
+}
+
+.admin-checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.05);
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border: 1px solid transparent;
+}
+
+.admin-checkbox-item:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.admin-checkbox-item.active {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: #6366f1;
+}
+
+.admin-checkbox-item input { display: none; }
+
+.admin-select, .admin-input {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.admin-select:focus, .admin-input:focus {
+  border-color: #6366f1;
+}
+
+.admin-select option {
+  background: #1e293b;
+  color: white;
+}
+
+.admin-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-btn-primary {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+}
+
+.admin-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+}
+
+.admin-btn-copy {
+  background: rgba(255,255,255,0.1);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.admin-btn-copy:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+.admin-url-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.admin-url-text {
+  flex: 1;
+  background: rgba(0,0,0,0.3);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.82rem;
+  color: #a5b4fc;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-status-group {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-status-btn {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+}
+
+.admin-status-btn.normal {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  border-color: rgba(34, 197, 94, 0.3);
+}
+.admin-status-btn.normal.active, .admin-status-btn.normal:hover {
+  background: rgba(34, 197, 94, 0.25);
+  border-color: #22c55e;
+}
+
+.admin-status-btn.priority {
+  background: rgba(249, 115, 22, 0.1);
+  color: #fb923c;
+  border-color: rgba(249, 115, 22, 0.3);
+}
+.admin-status-btn.priority.active, .admin-status-btn.priority:hover {
+  background: rgba(249, 115, 22, 0.25);
+  border-color: #fb923c;
+}
+
+.admin-status-btn.closed {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+.admin-status-btn.closed.active, .admin-status-btn.closed:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: #f87171;
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #22c55e;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  animation: toastIn 0.3s ease, toastOut 0.3s ease 2s forwards;
+  z-index: 1000;
+}
+
+@keyframes toastIn {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes toastOut {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(24px); opacity: 0; }
+}
+
+/* ========================================
+   ADMIN FLIGHT TABLE
+======================================== */
+
+.admin-flight-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.admin-flight-table thead th {
+  padding: 10px 12px;
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.5);
+  border-bottom: 2px solid rgba(255,255,255,0.1);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.admin-flight-table tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background 0.2s;
+}
+
+.admin-flight-table tbody tr:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+.admin-flight-table tbody tr.editing-row {
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.admin-flight-table tbody td {
+  padding: 8px 12px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.admin-airline-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  font-size: 0.55rem;
+  font-weight: 800;
+  color: white;
+  flex-shrink: 0;
+}
+
+.admin-flight-status {
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.78rem;
+}
+
+.admin-flight-status.st-ontime { background: rgba(34,197,94,0.15); color: #22c55e; }
+.admin-flight-status.st-boarding { background: rgba(251,191,36,0.15); color: #fbbf24; }
+.admin-flight-status.st-delayed { background: rgba(249,115,22,0.15); color: #fb923c; }
+.admin-flight-status.st-departed { background: rgba(59,130,246,0.15); color: #3b82f6; }
+.admin-flight-status.st-cancelled { background: rgba(239,68,68,0.15); color: #ef4444; }
+.admin-flight-status.st-gatechanged { background: rgba(168,85,247,0.15); color: #a855f7; }
+
+.admin-btn-edit {
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 5px 12px;
+  font-size: 0.75rem;
+}
+
+.admin-btn-edit:hover {
+  background: rgba(99,102,241,0.15);
+  color: white;
+  border-color: rgba(99,102,241,0.4);
+}
+
+.admin-btn-save {
+  background: rgba(34,197,94,0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34,197,94,0.3);
+  padding: 5px 10px;
+  font-size: 0.75rem;
+}
+
+.admin-btn-save:hover {
+  background: rgba(34,197,94,0.25);
+}
+
+.admin-btn-cancel {
+  background: rgba(239,68,68,0.1);
+  color: #f87171;
+  border: 1px solid rgba(239,68,68,0.2);
+  padding: 5px 10px;
+  font-size: 0.75rem;
+}
+
+.admin-btn-cancel:hover {
+  background: rgba(239,68,68,0.2);
+}
