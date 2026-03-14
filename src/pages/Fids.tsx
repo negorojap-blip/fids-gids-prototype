@@ -1,4 +1,5 @@
-import { useEffect, useRef, useCallback } from 'preact/hooks';
+import { useEffect, useRef, useCallback, useState } from 'preact/hooks';
+import { EmergencyScreen, EmergencyType } from '../components/EmergencyScreen';
 
 // =============================================
 // Types
@@ -100,6 +101,8 @@ export function Fids() {
   const prevConfigKey = useRef('');
   const currentLangIdx = useRef(0);
   const langTimerRef = useRef<number | null>(null);
+
+  const [emergencyType, setEmergencyType] = useState<EmergencyType>(null);
 
   // ---- Build entire DOM tree once ----
   const buildAll = useCallback(() => {
@@ -321,6 +324,8 @@ export function Fids() {
           flights.current = data.flights || [];
           config.current = { languages: data.languages || ['ja', 'en'], interval: data.interval || 5 };
 
+          setEmergencyType(data.emergency?.type || null);
+
           // First load — build everything
           if (!built.current) {
             buildAll();
@@ -353,6 +358,7 @@ export function Fids() {
       .then(data => {
         flights.current = data.flights || [];
         config.current = { languages: data.languages || ['ja', 'en'], interval: data.interval || 5 };
+        setEmergencyType(data.emergency?.type || null);
         prevFlightsJson.current = JSON.stringify(data.flights);
         prevConfigKey = `${(data.languages || []).join(',')}|${data.interval}`;
         buildAll();
@@ -371,5 +377,10 @@ export function Fids() {
   // =============================================
   // JSX: only a single <div>. Preact touches nothing else.
   // =============================================
-  return <div ref={rootRef} />;
+  return (
+    <>
+      <div ref={rootRef} />
+      <EmergencyScreen type={emergencyType} />
+    </>
+  );
 }

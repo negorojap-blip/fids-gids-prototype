@@ -1,4 +1,5 @@
-import { useEffect, useRef, useCallback } from 'preact/hooks';
+import { useEffect, useRef, useCallback, useState } from 'preact/hooks';
+import { EmergencyScreen, EmergencyType } from '../components/EmergencyScreen';
 
 // =============================================
 // Types
@@ -140,6 +141,8 @@ export function Gids() {
   const currentStatus = useRef('');
   const currentLangIdx = useRef(0);
   const langTimerRef = useRef<number | null>(null);
+
+  const [emergencyType, setEmergencyType] = useState<EmergencyType>(null);
 
   // Template containers (only one visible at a time)
   const normalEl = useRef<HTMLElement | null>(null);
@@ -503,6 +506,9 @@ export function Gids() {
       const dataJson = JSON.stringify(raw.flight) + raw.status;
       const cfgKey = `${(raw.languages || []).join(',')}|${raw.interval}`;
 
+      // @ts-ignore
+      setEmergencyType(raw.emergency?.type || null);
+
       if (!built.current) {
         buildAll();
         bindData();
@@ -553,5 +559,10 @@ export function Gids() {
   }, []);
 
   // Preact renders only this single div — everything else is pure DOM
-  return <div ref={rootRef} style="width:100vw;height:100vh;" />;
+  return (
+    <>
+      <div ref={rootRef} style={{ width: '100vw', height: '100vh' }} />
+      <EmergencyScreen type={emergencyType} />
+    </>
+  );
 }

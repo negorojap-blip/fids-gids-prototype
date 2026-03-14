@@ -53,6 +53,7 @@ export function Admin() {
   const [toast, setToast] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [savingGids, setSavingGids] = useState(false);
+  const [emergencyType, setEmergencyType] = useState<string | null>(null);
 
   // Fetch current state on mount, and poll for auto-updates
   useEffect(() => {
@@ -66,6 +67,7 @@ export function Admin() {
           setGidsLangs(data.gids.languages || [data.gids.language || 'ja']);
           setGidsInterval(data.gids.interval || 5);
           setFlights(data.fids.flights || []);
+          setEmergencyType(data.emergency?.type || null);
         })
         .catch(() => {});
     };
@@ -131,6 +133,16 @@ export function Admin() {
     showToast('✅ GIDSステータスを更新しました');
   }, [showToast]);
 
+  const saveEmergency = useCallback(async (type: string | null) => {
+    setEmergencyType(type);
+    await fetch('/api/emergency/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type }),
+    });
+    showToast(`✅ 緊急ステータスを更新しました (${type || '通常'})`);
+  }, [showToast]);
+
   const updateFlight = useCallback(async (id: number, updates: any) => {
     await fetch('/api/fids/flight/update', {
       method: 'POST',
@@ -155,6 +167,40 @@ export function Admin() {
       </div>
 
       <div class="admin-grid">
+
+        {/* Emergency Controls (Full Width) */}
+        <div class="admin-card" style="grid-column: 1 / -1; border-color: #ef4444; background: rgba(239, 68, 68, 0.05);">
+          <h2><span class="icon">🚨</span>緊急時コントロール (Emergency Controls)</h2>
+          <div class="admin-section">
+            <p style="color:rgba(255,255,255,0.7); margin-bottom: 12px; font-size: 0.9rem;">
+              緊急ボタンを押すと、すべてのFIDSおよびGIDS端末が直ちに固定の避難誘導画面に切り替わります。
+            </p>
+            <div class="admin-status-group">
+              <button
+                class={`admin-status-btn ${emergencyType === 'fire' ? 'active' : ''}`}
+                style={emergencyType === 'fire' ? 'background: #ef4444; color: white;' : 'color: #ef4444; border-color: #ef4444;'}
+                onClick={() => saveEmergency('fire')}
+              >
+                🔥 火災 (Fire)
+              </button>
+              <button
+                class={`admin-status-btn ${emergencyType === 'earthquake' ? 'active' : ''}`}
+                style={emergencyType === 'earthquake' ? 'background: #f97316; color: white;' : 'color: #f97316; border-color: #f97316;'}
+                onClick={() => saveEmergency('earthquake')}
+              >
+                🌋 地震 (Earthquake)
+              </button>
+              <button
+                class={`admin-status-btn ${emergencyType === null ? 'active' : ''}`}
+                style={emergencyType === null ? 'background: rgba(255,255,255,0.2); color: white;' : 'color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.3);'}
+                onClick={() => saveEmergency(null)}
+              >
+                ✅ 通常に戻す (Reset)
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* FIDS Controls */}
         <div class="admin-card">
           <h2><span class="icon">🖥</span>FIDS（フライト情報画面）配信制御</h2>

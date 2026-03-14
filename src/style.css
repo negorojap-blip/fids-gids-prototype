@@ -800,6 +800,88 @@ html, body {
   white-space: nowrap;
 }
 
+/* ========================================
+   EMERGENCY SCREEN STYLES
+======================================== */
+
+.emergency-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background: #ff0000;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  animation: emergency-bg-pulse 2s infinite alternate;
+}
+
+@keyframes emergency-bg-pulse {
+  0% { background: #b90000; }
+  100% { background: #ff0000; }
+}
+
+.emergency-icon {
+  font-size: 8rem;
+  margin-bottom: 2rem;
+  filter: drop-shadow(0 0 20px rgba(0,0,0,0.5));
+}
+
+.icon-pulse {
+  display: inline-block;
+  animation: emergency-icon-pulse 1s infinite alternate;
+}
+
+@keyframes emergency-icon-pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.1); opacity: 1; }
+}
+
+.emergency-content-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1000px;
+  padding: 0 5%;
+}
+
+.emergency-lang-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.emergency-title-small {
+  font-size: 3.5rem;
+  font-weight: 900;
+  text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  letter-spacing: 0.1em;
+  line-height: 1.1;
+}
+
+.emergency-subtitle-small {
+  font-size: 2.2rem;
+  font-weight: 700;
+  text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  line-height: 1.2;
+}
+
+/* Language specific tweaks if needed */
+.lang-zh .emergency-title-small, .lang-zh .emergency-subtitle-small {
+  font-family: 'Noto Sans SC', sans-serif;
+}
+
+.lang-ko .emergency-title-small, .lang-ko .emergency-subtitle-small {
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+
 .admin-airline-badge {
   display: inline-flex;
   align-items: center;

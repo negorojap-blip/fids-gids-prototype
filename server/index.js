@@ -13,7 +13,8 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-const DATA_FILE = path.join(__dirname, 'data', 'state.json');
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
+const DATA_FILE = path.join(DATA_DIR, 'state.json');
 
 // === Data file management ===
 function ensureDataFile() {
@@ -27,6 +28,9 @@ function ensureDataFile() {
 
 function getInitialState() {
   return {
+    emergency: {
+      type: null, // null, 'fire', 'earthquake'
+    },
     fids: {
       languages: ['ja', 'en'],
       interval: 5,
@@ -193,13 +197,13 @@ app.get('/api/state', (req, res) => {
 // GET FIDS state
 app.get('/api/fids/:id', (req, res) => {
   const state = readState();
-  res.json(state.fids);
+  res.json({ ...state.fids, emergency: state.emergency });
 });
 
 // GET GIDS state
 app.get('/api/gids/:id', (req, res) => {
   const state = readState();
-  res.json(state.gids);
+  res.json({ ...state.gids, emergency: state.emergency });
 });
 
 // POST update FIDS settings (languages, interval)
@@ -250,6 +254,18 @@ app.post('/api/gids/update', (req, res) => {
   if (interval !== undefined) state.gids.interval = interval;
   writeState(state);
   res.json({ success: true, gids: state.gids });
+});
+
+// POST update Emergency state
+app.post('/api/emergency/update', (req, res) => {
+  const state = readState();
+  const { type } = req.body;
+  if (!state.emergency) {
+    state.emergency = { type: null };
+  }
+  state.emergency.type = type;
+  writeState(state);
+  res.json({ success: true, emergency: state.emergency });
 });
 
 // Serve frontend static files in production
