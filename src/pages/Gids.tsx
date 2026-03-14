@@ -218,9 +218,9 @@ export function Gids() {
     const flightValueDiv = document.createElement('div');
     flightValueDiv.className = 'gids-info-value';
     flightValueDiv.style.cssText = 'display:flex;align-items:center;gap:16px;';
-    const logoEl = document.createElement('div');
+    const logoEl = document.createElement('img');
     logoEl.className = 'airline-logo';
-    logoEl.style.cssText = 'width:40px;height:40px;font-size:0.8rem;border-radius:8px;';
+    logoEl.style.cssText = 'width:48px;height:48px;object-fit:contain;border-radius:4px;';
     const flightNumSpan = document.createElement('span');
     flightValueDiv.append(logoEl, flightNumSpan);
     flightCard.append(flightLabel, flightValueDiv);
@@ -283,9 +283,9 @@ export function Gids() {
     gate.className = 'gids-priority-gate';
     const flightBadge = document.createElement('div');
     flightBadge.className = 'gids-priority-flight-badge';
-    const logoEl = document.createElement('div');
+    const logoEl = document.createElement('img');
     logoEl.className = 'airline-logo';
-    logoEl.style.cssText = 'width:36px;height:36px;font-size:0.7rem;border-radius:6px;';
+    logoEl.style.cssText = 'width:36px;height:36px;object-fit:contain;border-radius:4px;';
     const flightSpan = document.createElement('span');
     flightBadge.append(logoEl, flightSpan);
     topLeft.append(gate, flightBadge);
@@ -423,8 +423,13 @@ export function Gids() {
       setText(nc.destValue, f.destination[lang] || f.destination.en);
       setText(nc.flightLabel, INFO_LABELS.flight[lang]);
       setText(nc.flightValue, f.flightNumber);
-      setText(nc.logoEl, f.airlineCode);
-      nc.logoEl.style.background = AIRLINE_COLORS[f.airlineCode] || '#6366f1';
+      
+      const newLogoSrc = `https://pics.avs.io/200/200/${f.airlineCode}.png`;
+      if (nc.logoEl.getAttribute('src') !== newLogoSrc) {
+        nc.logoEl.setAttribute('src', newLogoSrc);
+      }
+      nc.logoEl.style.background = 'transparent';
+      
       setText(nc.departLabel, INFO_LABELS.departure[lang]);
       setText(nc.departValue, f.departureTime);
       setText(nc.boardLabel, INFO_LABELS.boarding[lang]);
@@ -438,8 +443,13 @@ export function Gids() {
     if (pc) {
       setText(pc.gate, d.gateId);
       setText(pc.flightBadge, f.flightNumber);
-      setText(pc.logoEl, f.airlineCode);
-      pc.logoEl.style.background = AIRLINE_COLORS[f.airlineCode] || '#6366f1';
+      
+      const newLogoSrc = `https://pics.avs.io/200/200/${f.airlineCode}.png`;
+      if (pc.logoEl.getAttribute('src') !== newLogoSrc) {
+        pc.logoEl.setAttribute('src', newLogoSrc);
+      }
+      pc.logoEl.style.background = 'transparent';
+      
       setText(pc.destText, f.destination[lang] || f.destination.en);
       setText(pc.clock, timeStr);
       setText(pc.badge, STATUS_LABELS.priority[lang]);

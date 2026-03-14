@@ -180,8 +180,9 @@ export function Fids() {
 
       const tdLogoWrap = document.createElement('td');
       tdLogoWrap.className = 'col-logo';
-      const divLogo = document.createElement('div');
+      const divLogo = document.createElement('img');
       divLogo.className = 'airline-logo';
+      divLogo.style.cssText = 'height:30px;width:auto;object-fit:contain;';
       tdLogoWrap.appendChild(divLogo);
 
       const tdAirline = document.createElement('td');
@@ -249,9 +250,12 @@ export function Fids() {
       if (c.dest.textContent !== dest) c.dest.textContent = dest;
 
       if (c.flight.textContent !== f.flightNumber) c.flight.textContent = f.flightNumber;
-      if (c.logo.textContent !== f.airlineCode) {
-        c.logo.textContent = f.airlineCode;
-        c.logo.style.background = AIRLINE_COLORS[f.airlineCode] || '#6366f1';
+      
+      const newLogoSrc = `https://pics.avs.io/200/200/${f.airlineCode}.png`;
+      if (c.logo.getAttribute('src') !== newLogoSrc) {
+        c.logo.setAttribute('src', newLogoSrc);
+        c.logo.setAttribute('alt', f.airlineCode);
+        c.logo.style.background = 'transparent';
       }
 
       const airlineName = f.airline[lang] || f.airline.en;

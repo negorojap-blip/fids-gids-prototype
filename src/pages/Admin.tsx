@@ -351,7 +351,7 @@ export function Admin() {
                         <td>{f.destination?.ja}</td>
                         <td>
                           <span style="display:inline-flex;align-items:center;gap:6px;">
-                            <span class="admin-airline-badge" style={`background:${getAirlineColor(f.airlineCode)};`}>{f.airlineCode}</span>
+                            <img src={`https://pics.avs.io/200/200/${f.airlineCode}.png`} alt={f.airlineCode} class="admin-airline-logo" />
                             {f.airline?.ja}
                           </span>
                         </td>
@@ -429,7 +429,7 @@ function FlightEditRow({ flight, onSave, onCancel }: {
       <td style="color:rgba(255,255,255,0.4);font-size:0.8rem;">{flight.destination?.ja}</td>
       <td style="color:rgba(255,255,255,0.4);font-size:0.8rem;">
         <span style="display:inline-flex;align-items:center;gap:4px;">
-          <span class="admin-airline-badge" style={`background:${getAirlineColor(flight.airlineCode)};`}>{flight.airlineCode}</span>
+          <img src={`https://pics.avs.io/200/200/${flight.airlineCode}.png`} alt={flight.airlineCode} class="admin-airline-logo" />
           {flight.airline?.ja}
         </span>
       </td>
