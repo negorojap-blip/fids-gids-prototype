@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'preact/hooks';
+import { getTailFinSVG } from '../utils/tailFin';
 
 const LANG_LABELS: Record<string, string> = {
   ja: '日本語',
@@ -350,8 +351,8 @@ export function Admin() {
                         <td style="font-weight:600;">{f.flightNumber}</td>
                         <td>{f.destination?.ja}</td>
                         <td>
-                          <span style="display:inline-flex;align-items:center;gap:6px;">
-                            <img src={`https://pics.avs.io/200/200/${f.airlineCode}.png`} alt={f.airlineCode} class="admin-airline-logo" />
+                          <span style="display:inline-flex;align-items:center;gap:8px;">
+                            <div dangerouslySetInnerHTML={{ __html: getTailFinSVG(f.airlineCode, 24) }} />
                             {f.airline?.ja}
                           </span>
                         </td>
@@ -428,8 +429,8 @@ function FlightEditRow({ flight, onSave, onCancel }: {
       </td>
       <td style="color:rgba(255,255,255,0.4);font-size:0.8rem;">{flight.destination?.ja}</td>
       <td style="color:rgba(255,255,255,0.4);font-size:0.8rem;">
-        <span style="display:inline-flex;align-items:center;gap:4px;">
-          <img src={`https://pics.avs.io/200/200/${flight.airlineCode}.png`} alt={flight.airlineCode} class="admin-airline-logo" />
+        <span style="display:inline-flex;align-items:center;gap:6px;">
+          <div dangerouslySetInnerHTML={{ __html: getTailFinSVG(flight.airlineCode, 20) }} />
           {flight.airline?.ja}
         </span>
       </td>
