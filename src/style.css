@@ -53,6 +53,7 @@ html, body {
   justify-content: space-between;
   border-bottom: 2px solid var(--fids-accent);
   flex-shrink: 0;
+  min-height: 72px;
 }
 
 .fids-header h1 {
@@ -60,6 +61,7 @@ html, body {
   font-weight: 800;
   letter-spacing: 0.1em;
   color: white;
+  line-height: 1.2;
 }
 
 .fids-header .header-right {
@@ -106,6 +108,8 @@ html, body {
   border-bottom: 2px solid var(--fids-accent);
   text-align: left;
   white-space: nowrap;
+  line-height: 1.2;
+  height: 40px;
 }
 
 .fids-table tbody tr {
@@ -133,6 +137,7 @@ html, body {
   overflow: hidden;
   text-overflow: ellipsis;
   vertical-align: middle;
+  line-height: 1.2;
 }
 
 .fids-table .col-time { width: 7%; font-variant-numeric: tabular-nums; }
