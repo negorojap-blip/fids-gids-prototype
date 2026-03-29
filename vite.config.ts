@@ -1,12 +1,16 @@
 import { defineConfig } from 'vite';
 import preact from '@preact/preset-vite';
-import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   plugins: [
     preact(),
-    tailwindcss(),
   ],
+  esbuild: {
+    target: 'chrome73',
+  },
+  build: {
+    target: 'chrome73',
+  },
   server: {
     proxy: {
       '/api': 'http://localhost:3001',

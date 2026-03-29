@@ -34,6 +34,14 @@ function getInitialState() {
     fids: {
       languages: ['ja', 'en'],
       interval: 5,
+      template: { type: 'json' },
+      style: {
+        columns: ['time', 'destination', 'flight', 'logo', 'airline', 'gate', 'status', 'terminal', 'checkin', 'codeshare'],
+        fontSize: 'M',
+        theme: 'dark',
+        maxRows: 0,
+        headerTitle: '',
+      },
       flights: generateFlights(),
     },
     gids: {
@@ -197,21 +205,45 @@ app.get('/api/state', (req, res) => {
 // GET FIDS state
 app.get('/api/fids/:id', (req, res) => {
   const state = readState();
-  res.json({ ...state.fids, emergency: state.emergency });
+  // Ensure template field exists
+  const template = state.fids.template || { type: 'json' };
+  res.json({ ...state.fids, template, emergency: state.emergency });
 });
 
 // GET GIDS state
 app.get('/api/gids/:id', (req, res) => {
   const state = readState();
-  res.json({ ...state.gids, emergency: state.emergency });
+  const gateId = req.params.id.toUpperCase();
+  const gateParams = state.gates?.[gateId] || {};
+  
+  // Find the flight assigned to this gate
+  const targetFlightNum = gateParams.flightNumber || state.gids?.flight?.flightNumber;
+  const flight = state.fids?.flights?.find(f => f.flightNumber === targetFlightNum) || state.gids?.flight || null;
+
+  // Build the unified data structure the frontend expects under 'data'
+  res.json({
+    emergency: state.emergency?.type || 'none',
+    data: flight ? {
+      flightNumber: flight.flightNumber,
+      airlineCode: flight.airlineCode,
+      destination: flight.destination,
+      departureTime: flight.departureTime || flight.time, // fallback to time
+      boardingTime: flight.boardingTime || '10:00', // fallback
+      status: flight.status,
+      template: gateParams.template || state.gids?.status || 'normal',
+      gateId: gateId
+    } : null
+  });
 });
 
 // POST update FIDS settings (languages, interval)
 app.post('/api/fids/update', (req, res) => {
   const state = readState();
-  const { languages, interval } = req.body;
+  const { languages, interval, template, style } = req.body;
   if (languages !== undefined) state.fids.languages = languages;
   if (interval !== undefined) state.fids.interval = interval;
+  if (template !== undefined) state.fids.template = template;
+  if (style !== undefined) state.fids.style = style;
   writeState(state);
   res.json({ success: true, fids: state.fids });
 });
@@ -248,7 +280,14 @@ app.post('/api/fids/flight/update', (req, res) => {
 app.post('/api/gids/update', (req, res) => {
   const state = readState();
   const { status, language, languages, interval } = req.body;
-  if (status !== undefined) state.gids.status = status;
+  if (status !== undefined) {
+    state.gids.status = status;
+    // Also update the gates template so the GIDS API returns the correct template
+    const gateId = state.gids.gateId || 'G11';
+    if (!state.gates) state.gates = {};
+    if (!state.gates[gateId]) state.gates[gateId] = {};
+    state.gates[gateId].template = status;
+  }
   if (language !== undefined) state.gids.language = language;
   if (languages !== undefined) state.gids.languages = languages;
   if (interval !== undefined) state.gids.interval = interval;
@@ -273,9 +312,11 @@ const distPath = path.join(__dirname, '../dist');
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
   // SPA fallback: any route outside /api returns index.html
-  app.get(/(.*)/, (req, res) => {
-    if (!req.path.startsWith('/api')) {
+  app.use((req, res, next) => {
+    if (req.method === 'GET' && !req.path.startsWith('/api')) {
       res.sendFile(path.join(distPath, 'index.html'));
+    } else {
+      next();
     }
   });
 }

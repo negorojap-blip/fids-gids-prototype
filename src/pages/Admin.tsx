@@ -46,6 +46,14 @@ function getStatusKey(status: Record<string, string>): string {
 export function Admin() {
   const [fidsLangs, setFidsLangs] = useState<string[]>(['ja', 'en']);
   const [fidsInterval, setFidsInterval] = useState(5);
+  const [fidsTemplateType, setFidsTemplateType] = useState<'json' | 'html'>('json');
+  const [fidsTemplateUrl, setFidsTemplateUrl] = useState('');
+  // Style settings
+  const [fidsColumns, setFidsColumns] = useState<string[]>(['time', 'destination', 'flight', 'logo', 'airline', 'gate', 'status', 'terminal', 'checkin', 'codeshare']);
+  const [fidsFontSize, setFidsFontSize] = useState<string>('M');
+  const [fidsTheme, setFidsTheme] = useState<string>('dark');
+  const [fidsMaxRows, setFidsMaxRows] = useState<number>(0);
+  const [fidsHeaderTitle, setFidsHeaderTitle] = useState<string>('');
   const [gidsStatus, setGidsStatus] = useState('normal');
   const [gidsLangs, setGidsLangs] = useState<string[]>(['ja', 'en']);
   const [gidsInterval, setGidsInterval] = useState(5);
@@ -64,6 +72,15 @@ export function Admin() {
         .then((data) => {
           setFidsLangs(data.fids.languages || ['ja', 'en']);
           setFidsInterval(data.fids.interval || 5);
+          const tpl = data.fids.template || { type: 'json' };
+          setFidsTemplateType(tpl.type || 'json');
+          setFidsTemplateUrl(tpl.url || '');
+          const st = data.fids.style || {};
+          setFidsColumns(st.columns || ['time', 'destination', 'flight', 'logo', 'airline', 'gate', 'status', 'terminal', 'checkin', 'codeshare']);
+          setFidsFontSize(st.fontSize || 'M');
+          setFidsTheme(st.theme || 'dark');
+          setFidsMaxRows(st.maxRows || 0);
+          setFidsHeaderTitle(st.headerTitle || '');
           setGidsStatus(data.gids.status || 'normal');
           setGidsLangs(data.gids.languages || [data.gids.language || 'ja']);
           setGidsInterval(data.gids.interval || 5);
@@ -97,14 +114,34 @@ export function Admin() {
 
   const saveFids = useCallback(async () => {
     setSaving(true);
+    const template = fidsTemplateType === 'html'
+      ? { type: 'html', url: fidsTemplateUrl }
+      : { type: 'json' };
+    const style = {
+      columns: fidsColumns,
+      fontSize: fidsFontSize,
+      theme: fidsTheme,
+      maxRows: fidsMaxRows,
+      headerTitle: fidsHeaderTitle,
+    };
     await fetch('/api/fids/update', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ languages: fidsLangs, interval: fidsInterval }),
+      body: JSON.stringify({ languages: fidsLangs, interval: fidsInterval, template, style }),
     });
     setSaving(false);
     showToast('✅ FIDS設定を更新しました');
-  }, [fidsLangs, fidsInterval, showToast]);
+  }, [fidsLangs, fidsInterval, fidsTemplateType, fidsTemplateUrl, fidsColumns, fidsFontSize, fidsTheme, fidsMaxRows, fidsHeaderTitle, showToast]);
+
+  const toggleFidsColumn = useCallback((col: string) => {
+    setFidsColumns((prev) => {
+      if (prev.includes(col)) {
+        const next = prev.filter(c => c !== col);
+        return next.length === 0 ? [col] : next;
+      }
+      return [...prev, col];
+    });
+  }, []);
 
   const toggleGidsLang = useCallback((lang: string) => {
     setGidsLangs((prev) => {
@@ -243,6 +280,140 @@ export function Admin() {
               <option value={30}>30秒</option>
             </select>
           </div>
+
+          <div class="admin-section">
+            <label>テンプレートの選択</label>
+            <select
+              class="admin-select"
+              value={
+                fidsTemplateType === 'json' ? 'json'
+                : fidsTemplateUrl === '/samples/welcome.html' ? 'welcome'
+                : fidsTemplateUrl === '/samples/weather.html' ? 'weather'
+                : fidsTemplateUrl === '/samples/ad.html' ? 'ad'
+                : 'custom'
+              }
+              onChange={(e) => {
+                const v = (e.target as HTMLSelectElement).value;
+                if (v === 'json') {
+                  setFidsTemplateType('json');
+                  setFidsTemplateUrl('');
+                } else if (v === 'custom') {
+                  setFidsTemplateType('html');
+                  setFidsTemplateUrl('');
+                } else {
+                  setFidsTemplateType('html');
+                  const urlMap: Record<string, string> = {
+                    welcome: '/samples/welcome.html',
+                    weather: '/samples/weather.html',
+                    ad: '/samples/ad.html',
+                  };
+                  setFidsTemplateUrl(urlMap[v] || '');
+                }
+              }}
+            >
+              <option value="json">📊 標準テーブル（JSON）</option>
+              <option value="welcome">✈ ウェルカム画面</option>
+              <option value="weather">🌤 インフォメーション（天気・交通・為替）</option>
+              <option value="ad">🛍 広告（免税店・ラウンジ・セキュリティ）</option>
+              <option value="custom">🔗 カスタムURL</option>
+            </select>
+            {fidsTemplateType === 'html' && !(['/samples/welcome.html', '/samples/weather.html', '/samples/ad.html'].includes(fidsTemplateUrl)) && (
+              <div style="margin-top: 10px;">
+                <label>外部HTML URL</label>
+                <input
+                  class="admin-input"
+                  type="url"
+                  placeholder="https://example.com/fids-display.html"
+                  value={fidsTemplateUrl}
+                  onInput={(e) => setFidsTemplateUrl((e.target as HTMLInputElement).value)}
+                  style="width: 100%; padding: 10px; font-size: 0.9rem;"
+                />
+              </div>
+            )}
+          </div>
+
+          {fidsTemplateType === 'json' && (
+            <>
+              <div class="admin-section">
+                <label>表示列の選択</label>
+                <div class="admin-checkbox-group" style="flex-wrap:wrap;">
+                  {[
+                    { key: 'time', label: '時刻' },
+                    { key: 'destination', label: '行先' },
+                    { key: 'flight', label: '便名' },
+                    { key: 'logo', label: 'ロゴ' },
+                    { key: 'airline', label: '航空会社' },
+                    { key: 'gate', label: 'ゲート' },
+                    { key: 'status', label: '備考' },
+                    { key: 'terminal', label: 'ターミナル' },
+                    { key: 'checkin', label: 'チェックイン' },
+                    { key: 'codeshare', label: '共同運航' },
+                  ].map((col) => (
+                    <div
+                      key={col.key}
+                      class={`admin-checkbox-item ${fidsColumns.includes(col.key) ? 'active' : ''}`}
+                      onClick={() => toggleFidsColumn(col.key)}
+                    >
+                      <span>{col.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div class="admin-section">
+                <label>カラーテーマ</label>
+                <div class="admin-status-group">
+                  <button
+                    class={`admin-status-btn ${fidsTheme === 'dark' ? 'active' : ''}`}
+                    onClick={() => setFidsTheme('dark')}
+                    style={fidsTheme === 'dark' ? 'background:rgba(255,255,255,0.15);' : ''}
+                  >🌑 ダーク</button>
+                  <button
+                    class={`admin-status-btn ${fidsTheme === 'blue' ? 'active' : ''}`}
+                    onClick={() => setFidsTheme('blue')}
+                    style={fidsTheme === 'blue' ? 'background:rgba(96,165,250,0.2); color:#60a5fa;' : 'color:#60a5fa; border-color:#60a5fa;'}
+                  >🔵 ブルー</button>
+                  <button
+                    class={`admin-status-btn ${fidsTheme === 'green' ? 'active' : ''}`}
+                    onClick={() => setFidsTheme('green')}
+                    style={fidsTheme === 'green' ? 'background:rgba(74,222,128,0.2); color:#4ade80;' : 'color:#4ade80; border-color:#4ade80;'}
+                  >🟢 グリーン</button>
+                </div>
+              </div>
+
+              <div class="admin-section" style="display:flex; gap:1.5rem; flex-wrap:wrap;">
+                <div style="flex:1; min-width:140px;">
+                  <label>フォントサイズ</label>
+                  <select class="admin-select" value={fidsFontSize} onChange={(e) => setFidsFontSize((e.target as HTMLSelectElement).value)}>
+                    <option value="S">S（小）</option>
+                    <option value="M">M（中）</option>
+                    <option value="L">L（大）</option>
+                  </select>
+                </div>
+                <div style="flex:1; min-width:140px;">
+                  <label>表示便数</label>
+                  <select class="admin-select" value={fidsMaxRows} onChange={(e) => setFidsMaxRows(Number((e.target as HTMLSelectElement).value))}>
+                    <option value={0}>全件表示</option>
+                    <option value={10}>10便</option>
+                    <option value={15}>15便</option>
+                    <option value={18}>18便</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="admin-section">
+                <label>ヘッダータイトル（空欄 = デフォルト「出発便案内」）</label>
+                <input
+                  class="admin-input"
+                  type="text"
+                  placeholder="例: ✈ 日本国際空港 出発便案内"
+                  value={fidsHeaderTitle}
+                  onInput={(e) => setFidsHeaderTitle((e.target as HTMLInputElement).value)}
+                  style="width: 100%; padding: 10px; font-size: 0.9rem;"
+                />
+              </div>
+            </>
+          )}
 
           <button class="admin-btn admin-btn-primary" onClick={saveFids} disabled={saving}>
             {saving ? '保存中...' : '💾 設定を保存'}

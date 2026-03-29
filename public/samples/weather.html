@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather & Info Display</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;500;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: linear-gradient(180deg, #0a1628 0%, #162a50 100%);
+    color: #fff;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .header {
+    background: rgba(0,0,0,0.3);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid rgba(251,191,36,0.3);
+  }
+  .header h1 { font-size: 1.5rem; font-weight: 700; color: #fbbf24; }
+  .header .clock { font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 1.5rem;
+    padding: 2rem;
+    height: calc(100vh - 70px);
+  }
+  .card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+  }
+  .card h2 {
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .weather-main {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .weather-icon { font-size: 5rem; }
+  .weather-temp { font-size: 4rem; font-weight: 700; }
+  .weather-detail {
+    margin-top: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+  }
+  .weather-detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.95rem;
+  }
+  .weather-detail-item span:first-child { color: rgba(255,255,255,0.5); }
+  .transport-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .transport-name { font-weight: 500; }
+  .transport-time { color: #fbbf24; font-weight: 700; font-size: 1.1rem; }
+  .transport-status {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .st-ontime { background: rgba(34,197,94,0.2); color: #22c55e; }
+  .st-delayed { background: rgba(239,68,68,0.2); color: #ef4444; }
+  .exchange-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 1rem;
+  }
+  .exchange-rate { font-weight: 700; color: #fbbf24; }
+  .info-item {
+    padding: 0.8rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    line-height: 1.6;
+  }
+  .info-item .label { color: rgba(255,255,255,0.5); font-size: 0.85rem; }
+  .info-item .value { font-weight: 600; font-size: 1.05rem; margin-top: 0.2rem; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>✈ 日本国際空港 インフォメーション — Airport Information</h1>
+    <div class="clock" id="clock"></div>
+  </div>
+  <div class="grid">
+    <!-- Weather -->
+    <div class="card">
+      <h2>🌤 現在の天気 / Current Weather</h2>
+      <div class="weather-main">
+        <div class="weather-icon">☀️</div>
+        <div>
+          <div class="weather-temp">18°C</div>
+          <div style="color:rgba(255,255,255,0.5);">晴れ / Sunny</div>
+        </div>
+      </div>
+      <div class="weather-detail">
+        <div class="weather-detail-item"><span>湿度</span><span>45%</span></div>
+        <div class="weather-detail-item"><span>風速</span><span>3m/s</span></div>
+        <div class="weather-detail-item"><span>気圧</span><span>1013hPa</span></div>
+        <div class="weather-detail-item"><span>視程</span><span>15km</span></div>
+      </div>
+    </div>
+
+    <!-- Transport -->
+    <div class="card">
+      <h2>🚃 交通アクセス / Transport</h2>
+      <div class="transport-item">
+        <div class="transport-name">空港特急 → 東京</div>
+        <div class="transport-time">13:25</div>
+        <div class="transport-status st-ontime">定刻</div>
+      </div>
+      <div class="transport-item">
+        <div class="transport-name">空港特急 → 品川</div>
+        <div class="transport-time">13:55</div>
+        <div class="transport-status st-ontime">定刻</div>
+      </div>
+      <div class="transport-item">
+        <div class="transport-name">空港ライナー → 上野</div>
+        <div class="transport-time">13:40</div>
+        <div class="transport-status st-ontime">定刻</div>
+      </div>
+      <div class="transport-item">
+        <div class="transport-name">リムジンバス → 新宿</div>
+        <div class="transport-time">14:00</div>
+        <div class="transport-status st-delayed">遅延</div>
+      </div>
+      <div class="transport-item">
+        <div class="transport-name">リムジンバス → 横浜</div>
+        <div class="transport-time">14:15</div>
+        <div class="transport-status st-ontime">定刻</div>
+      </div>
+    </div>
+
+    <!-- Exchange Rates -->
+    <div class="card">
+      <h2>💱 為替レート / Exchange Rates</h2>
+      <div class="exchange-row"><span>🇺🇸 USD / 米ドル</span><span class="exchange-rate">¥ 149.50</span></div>
+      <div class="exchange-row"><span>🇪🇺 EUR / ユーロ</span><span class="exchange-rate">¥ 162.80</span></div>
+      <div class="exchange-row"><span>🇬🇧 GBP / 英ポンド</span><span class="exchange-rate">¥ 189.30</span></div>
+      <div class="exchange-row"><span>🇨🇳 CNY / 人民元</span><span class="exchange-rate">¥ 20.60</span></div>
+      <div class="exchange-row"><span>🇰🇷 KRW / ウォン</span><span class="exchange-rate">¥ 0.109</span></div>
+      <div class="exchange-row"><span>🇦🇺 AUD / 豪ドル</span><span class="exchange-rate">¥ 97.20</span></div>
+    </div>
+
+    <!-- Info -->
+    <div class="card">
+      <h2>📢 お知らせ / Notices</h2>
+      <div class="info-item">
+        <div class="label">Wi-Fi</div>
+        <div class="value">🟢 JIA-FREE-WIFI 無料利用可</div>
+      </div>
+      <div class="info-item">
+        <div class="label">手荷物検査待ち時間（目安）</div>
+        <div class="value">⏱ 約10分 / Approx. 10 min</div>
+      </div>
+      <div class="info-item">
+        <div class="label">出国審査待ち時間（目安）</div>
+        <div class="value">⏱ 約5分 / Approx. 5 min</div>
+      </div>
+      <div class="info-item">
+        <div class="label">本日の混雑状況</div>
+        <div class="value" style="color:#22c55e;">🟢 通常 / Normal</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').textContent =
+        now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+</body>
+</html>

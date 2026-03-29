@@ -1,4 +1,4 @@
-@import "tailwindcss";
+/* Tailwind CSS v4 removed for Chrome 73 compatibility */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+JP:wght@300;400;500;700;900&family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
 
@@ -65,9 +65,16 @@ html, body {
 .fids-header .header-right {
   display: flex;
   align-items: center;
-  gap: 16px;
   font-size: 0.9rem;
   color: var(--fids-accent);
+}
+
+.fids-header .header-right > * {
+  margin-left: 16px;
+}
+
+.fids-header .header-right > *:first-child {
+  margin-left: 0;
 }
 
 .fids-table-container {
@@ -268,7 +275,14 @@ html, body {
   justify-content: center;
   align-items: center;
   padding: 40px 48px;
-  gap: 48px;
+}
+
+.gids-content > * {
+  margin-bottom: 48px;
+}
+
+.gids-content > *:last-child {
+  margin-bottom: 0;
 }
 
 .gids-flight-info {
@@ -333,7 +347,6 @@ html, body {
 .gids-priority-flight-badge {
   display: flex;
   align-items: center;
-  gap: 12px;
   background: rgba(255,255,255,0.08);
   padding: 8px 20px;
   border-radius: 10px;
@@ -342,14 +355,29 @@ html, body {
   color: white;
 }
 
+.gids-priority-flight-badge > * {
+  margin-left: 12px;
+}
+
+.gids-priority-flight-badge > *:first-child {
+  margin-left: 0;
+}
+
 .gids-priority-center {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
   padding: 40px;
+}
+
+.gids-priority-center > * {
+  margin-bottom: 16px;
+}
+
+.gids-priority-center > *:last-child {
+  margin-bottom: 0;
 }
 
 .gids-priority-icon {
@@ -395,7 +423,6 @@ html, body {
 .gids-priority-detail-row {
   display: flex;
   align-items: center;
-  gap: 32px;
   margin-top: 32px;
   padding: 20px 40px;
   background: rgba(0,0,0,0.25);
@@ -403,11 +430,26 @@ html, body {
   border: 1px solid rgba(251,146,60,0.2);
 }
 
+.gids-priority-detail-row > * {
+  margin-left: 32px;
+}
+
+.gids-priority-detail-row > *:first-child {
+  margin-left: 0;
+}
+
 .gids-priority-detail-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+}
+
+.gids-priority-detail-item > * {
+  margin-bottom: 4px;
+}
+
+.gids-priority-detail-item > *:last-child {
+  margin-bottom: 0;
 }
 
 .gids-priority-detail-label {
@@ -456,8 +498,15 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
   padding: 40px;
+}
+
+.gids-closed-center > * {
+  margin-bottom: 16px;
+}
+
+.gids-closed-center > *:last-child {
+  margin-bottom: 0;
 }
 
 .gids-closed-icon {

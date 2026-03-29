@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Duty Free Promotion</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;500;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    background: #000;
+  }
+  .slide {
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+    padding: 3rem;
+  }
+  .slide.active { opacity: 1; }
+
+  /* Slide 1: Duty Free */
+  .slide-1 {
+    background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #0f0520 100%);
+  }
+  .slide-1 .content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    max-width: 1200px;
+  }
+  .promo-badge {
+    display: inline-block;
+    background: linear-gradient(90deg, #e11d48, #f43f5e);
+    color: #fff;
+    padding: 8px 24px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+  .promo-title {
+    font-size: 3rem;
+    font-weight: 900;
+    line-height: 1.2;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .promo-sub {
+    font-size: 1.2rem;
+    color: rgba(255,255,255,0.6);
+    margin-top: 1rem;
+    line-height: 1.8;
+  }
+  .promo-items {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+  }
+  .promo-item {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: transform 0.3s;
+  }
+  .promo-item .emoji { font-size: 2.5rem; margin-bottom: 0.5rem; }
+  .promo-item .name { font-weight: 600; font-size: 1rem; }
+  .promo-item .price { color: #fbbf24; font-weight: 700; font-size: 1.2rem; margin-top: 0.3rem; }
+  .promo-item .discount { color: #f43f5e; font-size: 0.85rem; font-weight: 600; }
+
+  /* Slide 2: Lounge */
+  .slide-2 {
+    background: linear-gradient(135deg, #0c1a0f 0%, #1a3320 50%, #0c1a0f 100%);
+  }
+  .slide-2 .content {
+    text-align: center;
+    max-width: 900px;
+  }
+  .lounge-icon { font-size: 5rem; margin-bottom: 1rem; }
+  .lounge-title {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #86efac;
+  }
+  .lounge-sub {
+    font-size: 1.3rem;
+    color: rgba(255,255,255,0.5);
+    margin: 1rem 0 2rem;
+  }
+  .lounge-features {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+  }
+  .lounge-feature {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(134,239,172,0.2);
+    border-radius: 16px;
+    padding: 2rem 1.5rem;
+    min-width: 160px;
+    text-align: center;
+  }
+  .lounge-feature .emoji { font-size: 2rem; margin-bottom: 0.5rem; }
+  .lounge-feature .label { font-weight: 600; font-size: 1rem; color: rgba(255,255,255,0.8); }
+
+  /* Slide 3: Safety */
+  .slide-3 {
+    background: linear-gradient(135deg, #1a1a3e 0%, #0f0f2e 100%);
+  }
+  .slide-3 .content {
+    text-align: center;
+    max-width: 1000px;
+  }
+  .safety-icon { font-size: 4rem; margin-bottom: 1rem; }
+  .safety-title { font-size: 2.5rem; font-weight: 700; margin-bottom: 2rem; color: #fff; }
+  .safety-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+  .safety-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 2rem 1rem;
+    text-align: center;
+  }
+  .safety-card .emoji { font-size: 2.5rem; display: block; margin-bottom: 0.8rem; }
+  .safety-card .ja { font-weight: 700; font-size: 1rem; color: #fff; }
+  .safety-card .en { color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-top: 0.3rem; }
+</style>
+</head>
+<body>
+  <!-- Slide 1: Duty Free -->
+  <div class="slide slide-1 active" id="slide0">
+    <div class="content">
+      <div>
+        <div class="promo-badge">🎉 期間限定 SALE</div>
+        <div class="promo-title">免税店<br>スプリングセール</div>
+        <div class="promo-sub">
+          DUTY FREE SPRING SALE<br>
+          最大30%OFF — 本日限り<br>
+          第1ターミナル 出国エリア 3F
+        </div>
+      </div>
+      <div class="promo-items">
+        <div class="promo-item">
+          <div class="emoji">🍫</div>
+          <div class="name">ロイズ チョコレート</div>
+          <div class="price">¥1,800</div>
+          <div class="discount">20% OFF</div>
+        </div>
+        <div class="promo-item">
+          <div class="emoji">🍶</div>
+          <div class="name">獺祭 純米大吟醸</div>
+          <div class="price">¥3,500</div>
+          <div class="discount">15% OFF</div>
+        </div>
+        <div class="promo-item">
+          <div class="emoji">💄</div>
+          <div class="name">SK-II フェイシャル</div>
+          <div class="price">¥12,800</div>
+          <div class="discount">30% OFF</div>
+        </div>
+        <div class="promo-item">
+          <div class="emoji">🎒</div>
+          <div class="name">サムソナイト</div>
+          <div class="price">¥28,000</div>
+          <div class="discount">25% OFF</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 2: Lounge -->
+  <div class="slide slide-2" id="slide1">
+    <div class="content">
+      <div class="lounge-icon">🛋️</div>
+      <div class="lounge-title">Sakura Lounge</div>
+      <div class="lounge-sub">ご搭乗までの時間を、くつろぎの空間で — Relax before your flight</div>
+      <div class="lounge-features">
+        <div class="lounge-feature"><div class="emoji">🍣</div><div class="label">和食ビュッフェ</div></div>
+        <div class="lounge-feature"><div class="emoji">🍷</div><div class="label">プレミアムBar</div></div>
+        <div class="lounge-feature"><div class="emoji">🛁</div><div class="label">シャワールーム</div></div>
+        <div class="lounge-feature"><div class="emoji">📶</div><div class="label">高速Wi-Fi</div></div>
+        <div class="lounge-feature"><div class="emoji">💺</div><div class="label">仮眠スペース</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 3: Safety Reminders -->
+  <div class="slide slide-3" id="slide2">
+    <div class="content">
+      <div class="safety-icon">🛡️</div>
+      <div class="safety-title">セキュリティのご案内 / Security Reminders</div>
+      <div class="safety-grid">
+        <div class="safety-card">
+          <span class="emoji">💧</span>
+          <div class="ja">液体は100ml以下</div>
+          <div class="en">Liquids max 100ml</div>
+        </div>
+        <div class="safety-card">
+          <span class="emoji">🔋</span>
+          <div class="ja">モバイルバッテリーは<br>機内持込のみ</div>
+          <div class="en">Power banks:<br>carry-on only</div>
+        </div>
+        <div class="safety-card">
+          <span class="emoji">🚫</span>
+          <div class="ja">荷物を放置<br>しないでください</div>
+          <div class="en">Do not leave bags<br>unattended</div>
+        </div>
+        <div class="safety-card">
+          <span class="emoji">🪪</span>
+          <div class="ja">身分証明書を<br>ご準備ください</div>
+          <div class="en">Have ID ready<br>at checkpoints</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    let current = 0;
+    setInterval(() => {
+      slides[current].classList.remove('active');
+      current = (current + 1) % slides.length;
+      slides[current].classList.add('active');
+    }, 8000);
+  </script>
+</body>
+</html>
