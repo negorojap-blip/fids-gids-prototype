@@ -249,6 +249,13 @@ export function Admin() {
               <div class="admin-url-text">{baseUrl}/fids/terminal1</div>
               <button class="admin-btn admin-btn-copy" onClick={() => copyUrl(`${baseUrl}/fids/terminal1`)}>📋 コピー</button>
             </div>
+            <div class="admin-url-row" style="margin-top: 6px;">
+              <div class="admin-url-text" style="color: #86efac;">{baseUrl}/fids-static.html</div>
+              <button class="admin-btn admin-btn-copy" onClick={() => copyUrl(`${baseUrl}/fids-static.html`)}>📋 コピー</button>
+            </div>
+            <div style="margin-top: 4px; font-size: 0.72rem; color: rgba(255,255,255,0.35);">
+              上段: Preact版（SPA）　／　下段: 純粋HTML版（ちらつき比較テスト用）
+            </div>
           </div>
 
           <div class="admin-section">

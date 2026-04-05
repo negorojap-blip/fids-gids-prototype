@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIDS — Static HTML Version</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{font-family:'Inter','Noto Sans JP',sans-serif;background:#0a0e1a;color:#e2e8f0;overflow:hidden;width:100vw;height:100vh}
+
+.fids-container{width:100vw;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.fids-header{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);padding:12px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #fbbf24;flex-shrink:0;min-height:72px}
+.fids-header h1{font-size:1.5rem;font-weight:800;letter-spacing:0.1em;color:white;line-height:1.2}
+.header-right{display:flex;align-items:center;font-size:0.9rem;color:#fbbf24}
+.header-right>*{margin-left:16px}
+.header-right>*:first-child{margin-left:0}
+
+.fids-table-container{flex:1;overflow:hidden;padding:0}
+.fids-table{width:100%;border-collapse:collapse;table-layout:fixed}
+.fids-table thead{background:linear-gradient(180deg,#1a2744 0%,#0f1b33 100%);position:sticky;top:0;z-index:10}
+.fids-table thead th{padding:10px 12px;font-weight:700;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.08em;color:#fbbf24;border-bottom:2px solid #fbbf24;text-align:left;white-space:nowrap;line-height:1.2;height:40px}
+.fids-table tbody tr{transition:background 0.3s ease}
+.fids-table tbody tr:nth-child(even){background:rgba(255,255,255,0.03)}
+.fids-table tbody tr:nth-child(odd){background:transparent}
+.fids-table tbody td{padding:8px 12px;font-size:1rem;border-bottom:1px solid #334155;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle;line-height:1.2}
+
+.col-time{width:7%;font-variant-numeric:tabular-nums;font-weight:700;color:#fbbf24}
+.col-dest{width:18%}
+.col-flight{width:9%;font-weight:700;letter-spacing:0.05em}
+.col-logo{width:4%;text-align:center}
+.col-airline{width:18%}
+.col-gate{width:6%;text-align:center;font-weight:700}
+.col-status{width:10%}
+.col-terminal{width:7%;text-align:center;color:rgba(255,255,255,0.5)}
+.col-checkin{width:9%;text-align:center;color:rgba(255,255,255,0.5);font-size:0.8rem}
+.col-codeshare{width:12%;color:rgba(255,255,255,0.4);font-size:0.82rem}
+
+.status-ontime{color:#22c55e}
+.status-boarding,.status-nowboarding{color:#fbbf24;animation:pulse-text 1.5s ease-in-out infinite}
+.status-delayed{color:#f97316}
+.status-departed{color:#3b82f6}
+.status-cancelled{color:#ef4444;font-weight:700}
+
+@keyframes pulse-text{0%,100%{opacity:1}50%{opacity:0.4}}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.lang-badge{background:rgba(251,191,36,0.13);color:#fbbf24;padding:4px 12px;border-radius:6px;font-weight:700;font-size:0.75rem}
+.clock{font-size:1.4rem;font-weight:800;font-variant-numeric:tabular-nums;color:#fbbf24}
+.clock-date{font-size:0.7rem;color:rgba(255,255,255,0.5);text-align:right}
+
+.fade-body{transition:opacity 0.4s ease}
+</style>
+</head>
+<body>
+<div class="fids-container">
+  <div class="fids-header">
+    <h1 id="title">✈ DEPARTURES</h1>
+    <div class="header-right">
+      <span id="langList" style="font-size:0.75rem;opacity:0.7">JA / EN</span>
+      <span id="langBadge" class="lang-badge">JA</span>
+      <div>
+        <div class="clock" id="clock">00:00:00</div>
+        <div class="clock-date" id="clockDate"></div>
+      </div>
+    </div>
+  </div>
+  <div class="fids-table-container">
+    <table class="fids-table">
+      <thead>
+        <tr id="headerRow"></tr>
+      </thead>
+      <tbody id="flightBody" class="fade-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// =============================================
+// Pure HTML FIDS — ES5 Compatible
+// No frameworks, no modules
+// =============================================
+(function() {
+  'use strict';
+
+  // --- Config ---
+  var POLL_INTERVAL = 3000;
+  var LANG_ROTATE_INTERVAL = 5000;
+  var LANGUAGES = ['ja', 'en'];
+  var currentLangIndex = 0;
+
+  // --- Labels ---
+  var TITLE_LABELS = { ja: '出発便案内', en: 'DEPARTURES' };
+  var HEADER_LABELS = {
+    time: { ja: '時刻', en: 'TIME' },
+    destination: { ja: '行先', en: 'DESTINATION' },
+    flight: { ja: '便名', en: 'FLIGHT' },
+    airline: { ja: '航空会社', en: 'AIRLINE' },
+    gate: { ja: 'ゲート', en: 'GATE' },
+    status: { ja: '備考', en: 'REMARKS' },
+    terminal: { ja: 'ターミナル', en: 'TERMINAL' },
+    checkin: { ja: 'チェックイン', en: 'CHECK-IN' },
+    codeshare: { ja: '共同運航', en: 'CODESHARE' }
+  };
+  var COLUMNS = ['time', 'destination', 'flight', 'logo', 'airline', 'gate', 'status', 'terminal', 'checkin', 'codeshare'];
+  var CODESHARES = ['NH*','JL*','','UA*','','SQ*','','CX*','','QF*','','NH*','','JL*','','DL*','','KE*'];
+  var TERMINALS = ['T1','T1','T2','T1','T2','T2','T1','T1','T2','T1','T2','T1','T1','T2','T2','T1','T2','T1'];
+  var CHECKINS = ['A01-A05','B10-B14','C01-C03','A06-A10','D01-D04','B15-B18','A11-A15','C04-C08','D05-D08','A16-A20','B01-B05','C09-C12','A21-A25','D09-D12','B06-B09','C13-C16','A26-A30','D13-D16'];
+
+  // --- Airline tail fin SVGs ---
+  var AIRLINES = {
+    'NH': { b: '#003e80', f: '#ffffff', type: 'ana' },
+    'JL': { b: '#ffffff', f: '#c8102e', type: 'jal' },
+    'UA': { b: '#003366', f: '#ffffff', type: 'ua' },
+    'DL': { b: '#003a70', f: '#e00034', type: 'dl' },
+    'CX': { b: '#005e3c', f: '#ffffff', type: 'cx' },
+    'SQ': { b: '#002552', f: '#f7c948', type: 'sq' },
+    'KE': { b: '#00A1DE', f: '#ffffff', type: 'ke' },
+    'CA': { b: '#ffffff', f: '#d32f2f', type: 'ca' },
+    'TG': { b: '#4B2582', f: '#FFC72C', type: 'tg' },
+    'QF': { b: '#e53935', f: '#ffffff', type: 'qf' }
+  };
+
+  function getTailFinSVG(code, width) {
+    var a = AIRLINES[code.toUpperCase()] || { b: '#6366f1', f: '#ffffff', type: 'default' };
+    var baseTailPath = 'M 10 90 L 80 90 L 80 15 Q 77 10 70 15 L 20 80 Q 15 85 15 90 Z';
+    var clipId = 'tailClip-' + code;
+    var clipPathDef = '<clipPath id="' + clipId + '"><path d="M 10 90 L 80 90 L 80 15 Q 77 10 70 15 L 20 80 Q 15 85 10 90 Z" /></clipPath>';
+    var design = '<rect x="0" y="0" width="100" height="100" fill="' + a.b + '"/>';
+    if (a.type === 'ana') design = '<rect x="0" y="0" width="100" height="100" fill="' + a.b + '"/><path d="M 20 50 L 80 0 L 80 30 L 0 90 Z" fill="#4B92DB"/><path d="M 30 60 L 80 20 L 80 40 L 10 90 Z" fill="#ffffff"/>';
+    else if (a.type === 'jal') design = '<rect x="0" y="0" width="100" height="100" fill="' + a.b + '"/><circle cx="50" cy="50" r="25" fill="' + a.f + '"/>';
+    else if (a.type === 'ua') design = '<rect x="0" y="0" width="100" height="100" fill="' + a.b + '"/><path d="M -10 40 Q 50 -10 110 40" stroke="#f7c948" stroke-width="8" fill="none"/><path d="M -10 60 Q 50 10 110 60" stroke="#ffffff" stroke-width="8" fill="none"/>';
+    else if (a.type === 'dl') design = '<rect x="0" y="0" width="100" height="100" fill="' + a.b + '"/><path d="M 50 80 L 70 20 L 80 20 L 60 80 Z" fill="' + a.f + '"/><path d="M 60 80 L 80 20 L 90 20 L 70 80 Z" fill="#ffffff" opacity="0.8"/>';
+    else if (a.type === 'cx') design = '<rect x="0" y="0" width="100" height="100" fill="' + a.b + '"/><path d="M 10 80 Q 50 50 80 10 Q 70 40 40 90 Z" fill="' + a.f + '"/><rect x="0" y="80" width="100" height="20" fill="#d32f2f"/>';
+    else if (a.type === 'sq') design = '<rect x="0" y="0" width="100" height="100" fill="' + a.b + '"/><rect x="0" y="70" width="100" height="30" fill="' + a.f + '"/><path d="M 20 70 Q 30 40 70 30 Q 50 50 50 70 Z" fill="' + a.f + '"/>';
+    else if (a.type === 'ca') design = '<rect x="0" y="0" width="100" height="100" fill="' + a.b + '"/><circle cx="50" cy="50" r="25" fill="' + a.f + '"/><path d="M 35 50 L 65 50" stroke="#ffffff" stroke-width="4"/>';
+    else if (a.type === 'tg') design = '<rect x="0" y="0" width="100" height="100" fill="' + a.b + '"/><circle cx="50" cy="50" r="20" fill="' + a.f + '"/><circle cx="50" cy="50" r="25" stroke="#E6007E" stroke-width="4" fill="none"/><rect x="0" y="0" width="100" height="15" fill="#E6007E"/>';
+    else if (a.type === 'ke') design = '<rect x="0" y="0" width="100" height="100" fill="' + a.b + '"/><circle cx="50" cy="40" r="25" fill="' + a.f + '"/><path d="M 25 40 Q 50 20 75 40 Q 50 60 25 40 Z" fill="#d32f2f"/>';
+    else if (a.type === 'qf') design = '<rect x="0" y="0" width="100" height="100" fill="' + a.b + '"/><path d="M 30 90 Q 50 40 80 20 Q 60 50 60 90 Z" fill="' + a.f + '"/>';
+
+    return '<svg viewBox="0 0 100 100" width="' + width + '" height="' + width + '" style="filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));display:block"><defs>' + clipPathDef + '</defs><path d="' + baseTailPath + '" fill="#333"/><g clip-path="url(#' + clipId + ')">' + design + '</g><path d="' + baseTailPath + '" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/></svg>';
+  }
+
+  // --- Status class helper ---
+  function getStatusClass(text) {
+    var s = text.toLowerCase();
+    if (s.indexOf('on time') >= 0 || s.indexOf('定刻') >= 0) return 'status-ontime';
+    if (s.indexOf('now boarding') >= 0 || s.indexOf('搭乗案内') >= 0) return 'status-nowboarding';
+    if (s.indexOf('boarding') >= 0 || s.indexOf('搭乗中') >= 0) return 'status-boarding';
+    if (s.indexOf('delayed') >= 0 || s.indexOf('遅延') >= 0) return 'status-delayed';
+    if (s.indexOf('departed') >= 0 || s.indexOf('出発済') >= 0) return 'status-departed';
+    if (s.indexOf('cancelled') >= 0 || s.indexOf('欠航') >= 0) return 'status-cancelled';
+    if (s.indexOf('gate changed') >= 0 || s.indexOf('ゲート変更') >= 0) return 'status-delayed';
+    return '';
+  }
+
+  // --- Clock ---
+  function updateClock() {
+    var now = new Date();
+    var h = String(now.getHours()); if (h.length < 2) h = '0' + h;
+    var m = String(now.getMinutes()); if (m.length < 2) m = '0' + m;
+    var s = String(now.getSeconds()); if (s.length < 2) s = '0' + s;
+    document.getElementById('clock').textContent = h + ':' + m + ':' + s;
+
+    var days = ['日','月','火','水','木','金','土'];
+    var y = now.getFullYear();
+    var mo = String(now.getMonth() + 1); if (mo.length < 2) mo = '0' + mo;
+    var d = String(now.getDate()); if (d.length < 2) d = '0' + d;
+    document.getElementById('clockDate').textContent = y + '/' + mo + '/' + d + '(' + days[now.getDay()] + ')';
+  }
+
+  // --- Data storage ---
+  var flights = [];
+
+  // --- Render header ---
+  function renderHeader(lang) {
+    var tr = document.getElementById('headerRow');
+    var html = '';
+    for (var i = 0; i < COLUMNS.length; i++) {
+      var col = COLUMNS[i];
+      var cls = '';
+      if (col === 'time') cls = 'col-time';
+      else if (col === 'destination') cls = 'col-dest';
+      else if (col === 'flight') cls = 'col-flight';
+      else if (col === 'logo') cls = 'col-logo';
+      else if (col === 'airline') cls = 'col-airline';
+      else if (col === 'gate') cls = 'col-gate';
+      else if (col === 'status') cls = 'col-status';
+      else if (col === 'terminal') cls = 'col-terminal';
+      else if (col === 'checkin') cls = 'col-checkin';
+      else if (col === 'codeshare') cls = 'col-codeshare';
+
+      var label = '';
+      if (col === 'logo') label = '';
+      else if (HEADER_LABELS[col]) label = HEADER_LABELS[col][lang] || HEADER_LABELS[col]['en'] || '';
+      html += '<th class="' + cls + '">' + label + '</th>';
+    }
+    tr.innerHTML = html;
+  }
+
+  // --- Render flights ---
+  function renderFlights(lang) {
+    var tbody = document.getElementById('flightBody');
+    var html = '';
+    for (var i = 0; i < flights.length; i++) {
+      var f = flights[i];
+      var dest = (f.destination && f.destination[lang]) || (f.destination && f.destination.en) || '';
+      var airline = (f.airline && f.airline[lang]) || (f.airline && f.airline.en) || '';
+      var statusText = (f.status && f.status[lang]) || (f.status && f.status.en) || '';
+      var statusCls = getStatusClass(statusText);
+      var codeshare = CODESHARES[i % CODESHARES.length];
+      var terminal = TERMINALS[i % TERMINALS.length];
+      var checkin = CHECKINS[i % CHECKINS.length];
+      var rowBg = (i % 2 === 0) ? 'background:rgba(255,255,255,0.03)' : '';
+
+      html += '<tr style="' + rowBg + '">';
+      html += '<td class="col-time">' + f.time + '</td>';
+      html += '<td class="col-dest">' + dest + '</td>';
+      html += '<td class="col-flight">' + f.flightNumber + '</td>';
+      html += '<td class="col-logo"><div style="display:flex;align-items:center;justify-content:center">' + getTailFinSVG(f.airlineCode || '', 36) + '</div></td>';
+      html += '<td class="col-airline">' + airline + '</td>';
+      html += '<td class="col-gate">' + f.gate + '</td>';
+      html += '<td class="col-status ' + statusCls + '" style="font-weight:600">' + statusText + '</td>';
+      html += '<td class="col-terminal">' + terminal + '</td>';
+      html += '<td class="col-checkin">' + checkin + '</td>';
+      html += '<td class="col-codeshare">' + codeshare + '</td>';
+      html += '</tr>';
+    }
+    tbody.innerHTML = html;
+  }
+
+  // --- Full render (header + body) ---
+  function renderAll() {
+    var lang = LANGUAGES[currentLangIndex] || 'ja';
+    var titleText = TITLE_LABELS[lang] || TITLE_LABELS['en'];
+    document.getElementById('title').textContent = '✈ ' + titleText;
+    document.getElementById('langBadge').textContent = lang.toUpperCase();
+    document.getElementById('langList').textContent = LANGUAGES.map(function(l) { return l.toUpperCase(); }).join(' / ');
+
+    renderHeader(lang);
+    renderFlights(lang);
+  }
+
+  // --- Fetch flight data ---
+  function fetchData() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/api/fids/terminal1', true);
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        try {
+          var data = JSON.parse(xhr.responseText);
+          flights = data.flights || [];
+          renderAll();
+        } catch (e) {
+          // ignore parse errors
+        }
+      }
+    };
+    xhr.send();
+  }
+
+  // --- Language rotation with fade ---
+  function rotateLang() {
+    if (LANGUAGES.length <= 1) return;
+    var tbody = document.getElementById('flightBody');
+    // Fade out
+    tbody.style.opacity = '0';
+    setTimeout(function() {
+      currentLangIndex = (currentLangIndex + 1) % LANGUAGES.length;
+      renderAll();
+      // Fade in
+      tbody.style.opacity = '1';
+    }, 400);
+  }
+
+  // --- Initialize ---
+  updateClock();
+  setInterval(updateClock, 1000);
+  fetchData();
+  setInterval(fetchData, POLL_INTERVAL);
+  setInterval(rotateLang, LANG_ROTATE_INTERVAL);
+})();
+</script>
+</body>
+</html>
