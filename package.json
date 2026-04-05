@@ -8,20 +8,28 @@
     "dev": "concurrently \"node server/index.js\" \"vite\"",
     "dev:client": "vite",
     "dev:server": "node server/index.js",
-    "build": "vite build",
+    "build": "vite build && node post-build-es5.js",
+    "build:modern": "vite build",
     "preview": "vite preview",
     "preinstall": "npm config set legacy-peer-deps true"
   },
   "dependencies": {
+    "@preact/preset-vite": "^2.9.4",
+    "@tailwindcss/vite": "^4.2.1",
+    "concurrently": "^9.1.2",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "preact": "^10.29.0",
     "preact-router": "^4.1.2",
-    "@preact/preset-vite": "^2.9.4",
-    "@tailwindcss/vite": "^4.2.1",
-    "concurrently": "^9.1.2",
     "tailwindcss": "^4.2.1",
     "typescript": "~5.9.3",
     "vite": "^8.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.28.6",
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.2",
+    "core-js": "^3.49.0",
+    "terser": "^5.46.1"
   }
 }
